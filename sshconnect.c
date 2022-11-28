@@ -70,6 +70,8 @@
 #include "authfd.h"
 #include "kex.h"
 
+#include "mnemonic.h"
+
 struct sshkey *previous_host_key = NULL;
 
 static int matching_host_key_dns = 0;
@@ -1161,6 +1163,25 @@ check_host_key(char *hostname, const struct ssh_conn_info *cinfo,
 				fatal_f("sshkey_fingerprint failed");
 			xextendf(&msg1, "\n", "%s key fingerprint is %s.",
 			    type, fp);
+
+			int mn_word_count = mn_words_required(sizeof(char) * strlen(fp));
+			char *fp_mn = malloc(sizeof(char) * mn_word_count * 7);
+			int mn_res = mn_encode(fp, sizeof(char) * strlen(fp), 
+				fp_mn, sizeof(char) * mn_word_count * 9, NULL); 
+				// max word size = 7 + 2 dashes max per word
+			
+			if (mn_res == MN_OK)
+			{
+				// only append if successful
+				xextendf(&msg1, "\n", "Read as %s", fp_mn);
+				xextendf(&msg1, "\n", "Words required: %i\nLength of fp: %li\nLength of readable: %li", mn_word_count, strlen(fp), strlen(fp_mn));
+			}
+			else
+			{
+				xextendf(&msg1, "\n", "Words required: %i\nChar size: %li\nResult: %i", mn_word_count, sizeof(char), mn_res);
+				xextendf(&msg1, "\n", "What we got %s", fp_mn);
+			}
+
 			if (options.visual_host_key)
 				xextendf(&msg1, "\n", "%s", ra);
 			if (options.verify_host_key_dns) {
