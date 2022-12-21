@@ -1,3 +1,13 @@
+This fork was made to support readable hashes for the host key fingerprint in the OpenSSH client.
+
+The two readable hashes implemented are: https://github.com/anandv96/tiny-bip39 , and: https://github.com/anandv96/mnemonicode
+
+Binaries are checked in for these two hashes: `ssh-mnemonic` and `ssh-lipbip39`
+
+`ssh-lipbip39` requires dynamic libraries at `/vagrant/openssh-portable/libbip39.so`
+
+---
+
 See https://www.openssh.com/releasenotes.html#9.1p1 for the release notes.
 
 Please read https://www.openssh.com/report.html for bug reporting
